@@ -148,7 +148,7 @@ class DoubanApp
   private
   def save_as_local(url_image)
     if Weibo::Config.is_proxy_use then
-      web_proxy = Net::HTTP::Proxy('nproxy.slof.com', 80, "yangxd", "the_my_003131302")
+      web_proxy = Net::HTTP::Proxy('nproxy.slof.com', 80, "yangxd", "my003131302")
     else
       web_proxy = Net::HTTP
     end
