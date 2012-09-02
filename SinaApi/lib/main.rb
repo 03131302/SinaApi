@@ -13,18 +13,18 @@ class CreateInfoTool
 
   def initialize
     Weibo::Config.img_dir = "D:/douban_image/"
-    Weibo::Config.is_proxy_use = true
+    Weibo::Config.is_proxy_use = false
     Weibo::Config.is_to_gbk = false
     Weibo::Config.proxy = "http://yangxd:my003131302@nproxy.slof.com:80"
-    @app = DoubanApp.new
-
-    #电影
-    @data = @app.parse(@app.access_token.get("/movie/subjects?tag=%E7%8A%AF%E7%BD%AA&start-index=320&max-results=10&alt=json").body)
-    #书
-    @data_books = @app.parse(@app.access_token.get("/book/subjects?tag=%E5%B0%8F%E8%AF%B4&start-index=320&max-results=10&alt=json").body)
-    #歌
-    @data_musices = @app.parse(@app.access_token.get("/music/subjects?tag=%E6%B0%91%E8%B0%A3&start-index=320&max-results=10&alt=json").body)
-
+=begin
+          @app = DoubanApp.new
+          #电影
+          @data = @app.parse(@app.access_token.get("/movie/subjects?tag=%E7%8A%AF%E7%BD%AA&start-index=360&max-results=10&alt=json").body)
+          #书
+          @data_books = @app.parse(@app.access_token.get("/book/subjects?tag=%E5%B0%8F%E8%AF%B4&start-index=360&max-results=10&alt=json").body)
+          #歌
+          @data_musices = @app.parse(@app.access_token.get("/music/subjects?tag=%E6%B0%91%E8%B0%A3&start-index=360&max-results=10&alt=json").body)
+=end
     @sina_app = SinaApp.new
   end
 
