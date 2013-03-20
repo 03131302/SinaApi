@@ -12,19 +12,19 @@ class CreateInfoTool
   @@time = 60
 
   def initialize
-    Weibo::Config.img_dir = "D:/douban_image/"
+    Weibo::Config.img_dir = '/home/yangxd/Ruby/douban_image/'
     Weibo::Config.is_proxy_use = false
     Weibo::Config.is_to_gbk = false
-    Weibo::Config.proxy = "http://yangxd:my003131302@nproxy.slof.com:80"
-=begin
-          @app = DoubanApp.new
-          #电影
-          @data = @app.parse(@app.access_token.get("/movie/subjects?tag=%E7%8A%AF%E7%BD%AA&start-index=360&max-results=10&alt=json").body)
-          #书
-          @data_books = @app.parse(@app.access_token.get("/book/subjects?tag=%E5%B0%8F%E8%AF%B4&start-index=360&max-results=10&alt=json").body)
-          #歌
-          @data_musices = @app.parse(@app.access_token.get("/music/subjects?tag=%E6%B0%91%E8%B0%A3&start-index=360&max-results=10&alt=json").body)
-=end
+    Weibo::Config.proxy = 'http://yangxd:my003131302@nproxy.slof.com:80'
+#=begin
+    @app = DoubanApp.new
+#电影
+    #@data = @app.parse(@app.access_token.get("/v2/movie/search?tag=%E7%A7%91%E5%B9%BB&start=34&count=10&alt=json").body)
+#书
+    #@data_books = @app.parse(@app.access_token.get("/v2/book/search?tag=%E5%B0%8F%E8%AF%B4&start=380&count=10&alt=json").body)
+#歌
+    @data_musices = @app.parse(@app.access_token.get("/v2/music/search?tag=%E6%B0%91%E8%B0%A3&start=380&count=10&alt=json").body)
+#=end
     @sina_app = SinaApp.new
   end
 
@@ -32,16 +32,18 @@ class CreateInfoTool
     #    threads = [Thread.new{create_bookes},Thread.new {create_weibo},Thread.new {create_musices}];
     #    threads.each { |t|  t.run;puts "线程启动:#{t.to_s}" }
     #    threads.each { |item| item.join  }
-    create_bookes
-    create_weibo
+    #create_bookes
+    #create_weibo
     create_musices
   end
 
   def create_weibo
-    @data['entry'].each do |item|
+    puts @data
+    @data['subjects'].each do |item|
       id_url = @app.moveid(item)
       begin
-        move_data = @app.parse(@app.access_token.get("#{id_url}?start-index=1&max-results=1&alt=json").body)
+        temp_body = @app.access_token.get("/v2/movie/subject/#{id_url}").body
+        move_data = @app.parse(temp_body)
       rescue => err
         puts err
       end
@@ -50,9 +52,10 @@ class CreateInfoTool
       subcontent = @app.cast(move_data)
       sub_length = 140 - content.length
       sub_length = 0 if sub_length < 0
-      content << "#{subcontent[0, sub_length-30]}...}" unless subcontent.nil?
+      content << "#{subcontent[0, sub_length-30]}..." unless subcontent.nil?
       content << "#{@app.link(move_data)}" unless move_data.nil?
       begin
+        puts content
         puts @sina_app.upload(content, @app.img(move_data))
       rescue => err
         puts err
@@ -64,14 +67,17 @@ class CreateInfoTool
   end
 
   def create_bookes
-    @data_books['entry'].each do |item|
+    @data_books['books'].each do |item|
       id_url = @app.moveid(item)
       begin
-        move_data = @app.parse(@app.access_token.get("#{id_url}?start-index=1&max-results=1&alt=json").body)
+        temp_body = @app.access_token.get("/v2/book/#{id_url}").body
+        puts temp_body
+        move_data = @app.parse(temp_body)
+        puts move_data
       rescue => err
         puts err
       end
-      content = "[威武]小说：书名：《#{@app.titlename(move_data)}》,作者：#{@app.authorname(move_data)},简介："
+      content = "[威武]小说：书名：《#{@app.titlename(move_data)}》,作者：#{@app.authorname_book(move_data)},简介："
       subcontent = @app.summary(move_data)
       sub_length = 140 - content.length
       sub_length = 0 if sub_length < 0
@@ -89,21 +95,21 @@ class CreateInfoTool
   end
 
   def create_musices
-    @data_musices['entry'].each do |item|
+    @data_musices['musics'].each do |item|
       id_url = @app.moveid(item)
       begin
-        move_data = @app.parse(@app.access_token.get("#{id_url}?start-index=1&max-results=1&alt=json").body)
+        move_data = @app.parse(@app.access_token.get("/v2/music/#{id_url}?alt=json").body)
       rescue => err
         puts err
       end
-      content = "[神马]好歌：歌名：#{@app.titlename(move_data)},演唱：#{@app.authorname(move_data)},简介："
+      content = "[神马]好歌：歌名：#{@app.titlename(move_data)},演唱：#{@app.authorname_m(move_data)},简介："
       subcontent = @app.summary(move_data)
       sub_length = 140 - content.length
       sub_length = 0 if sub_length < 0
       content << "#{subcontent[0, sub_length-30]}..." unless subcontent.nil?
       content << "#{@app.link(move_data)}" unless move_data.nil?
       begin
-        puts @sina_app.upload(content, @app.img(move_data))
+        puts @sina_app.upload(content, @app.img_m(move_data))
       rescue => err
         puts err
       ensure

@@ -76,6 +76,8 @@ class DoubanApp
       browser.link(:text, "登录").click
       browser.text_field(:id, "email").set("03131302@163.com")
       browser.text_field(:id, "password").set("the003131302")
+      puts "请输入验证码:"
+      code_a = gets
       browser.button(:name, "user_login").click
       browser.button(:name, "confirm").click
       browser.url
@@ -94,54 +96,84 @@ class DoubanApp
   #获取导演名称
   def authorname(item)
     author = ""
-    item["author"].each { |item2| author += item2["name"]["$t"]+"," } if (!item.nil? && !item["author"].nil?)
+    item["directors"].each do |item2|
+      author += item2["name"]+","
+    end if (!item.nil? && !item["directors"].nil?)
+    author[0, author.length-1]
+  end
+
+  #获取导演名称
+  def authorname_m(item)
+    author = ""
+    item["author"].each do |item2|
+      author += item2["name"]+"," unless item2.nil? && item2["name"].nil?
+    end if (!item.nil? && !item["author"].nil?)
+    author[0, author.length-1]
+  end
+
+  #获取导演名称
+  def authorname_book(item)
+    author = ""
+    item["author"].each do |item2|
+      author += item2+"," unless item2.nil?
+    end if (!item.nil? && !item["author"].nil?)
     author[0, author.length-1]
   end
 
   #获取电影名称
   def titlename(item)
-    name = item["title"]["$t"] if (!item.nil? && !item["title"].nil?)
-    zh_name = ""
-    item["db:attribute"].each { |item2| zh_name = item2["$t"] if ("aka" == item2["@name"] && "zh_CN" == item2["@lang"]) } unless item.nil?
-    ("" == zh_name or zh_name.nil?) ? name : "#{zh_name}(#{name})"
+    name = item["title"] if (!item.nil? && !item["title"].nil?)
   end
 
   #获取ID
   def moveid(item)
-    item["id"]["$t"] unless item.nil?
+    item["id"] unless item.nil?
   end
 
   #获取简介
   def summary(item)
-    item["summary"]["$t"] if (!item.nil? && !item["summary"].nil?)
+    item["summary"] if (!item.nil? && !item["summary"].nil?)
   end
 
   #获得标签
   def tag(item)
     tags = ""
-    item["db:tag"].each { |item2| tags += item2["@name"]+"," } unless item.nil?
+    item["genres"].each { |item2| tags += item2+"," } unless item.nil? unless item["genres"].nil?
     tags[0, tags.length-1]
   end
 
   #演员表
   # @param item [Object]
   def cast(item)
-    cast = ""
-    item["db:attribute"].each { |item2| cast += item2["$t"]+"," if "cast" == item2["@name"] } unless item.nil?
-    cast[0, cast.length-1]
+    begin
+      cast = ""
+      item["casts"].each { |item2| cast += item2["name"]+"," unless item2.nil? && item2["name"].nil? } unless item.nil? && item["casts"].nil?
+      cast[0, cast.length-1]
+    rescue => err
+      puts err
+    ensure
+      puts "跳过"
+    end
   end
 
   #获取图片
   def img(item)
     dir = ""
-    item["link"].each { |item2| dir = item2["@href"] if "image" == item2["@rel"] } unless item.nil?
+    dir=item["images"]["large"] unless item.nil? && item["images"].nil? && item["images"]["large"].nil?
+    save_as_local(dir)
+  end
+
+  #获取图片
+  def img_m(item)
+    dir = ""
+    dir=item["image"] unless item.nil? && item["image"].nil?
     save_as_local(dir)
   end
 
   #连接到豆瓣
   def link(item)
     dir = ""
-    item["link"].each { |item2| dir = item2["@href"] if "alternate" == item2["@rel"] } unless item.nil?
+    dir = item["alt"] unless item.nil? && item["alt"].nil?
     dir
   end
 
@@ -167,16 +199,27 @@ class DoubanApp
 
 end
 #API测试，检索电影
-#Weibo::Config.proxy = "http://yangxd:0003131302@nproxy.slof.com:80"
-#app = DoubanApp.new
-#data = app.parse(app.access_token.get("/movie/subjects?tag=%E7%A7%91%E5%B9%BB&start-index=1&max-results=1&alt=json").body)
-#data['entry'].each do |item|
-#  id_url = app.moveid(item)
-#  move_data = app.parse(app.access_token.get("#{id_url}?start-index=1&max-results=2&alt=json").body)
-#  puts "导演：#{app.authorname(move_data)}"
-#  puts "名称：#{app.titlename(move_data)}"
-#  puts "演员表：#{app.cast(move_data)}"
-#  puts "标签：#{app.tag(move_data)}"
-#  puts "简介：#{app.summary(move_data)}"
-#  puts "图片：#{app.img(move_data)}"
-#end
+=begin
+Weibo::Config.img_dir = '/home/yangxd/Ruby/douban_image/'
+Weibo::Config.is_proxy_use = false
+Weibo::Config.is_to_gbk = false
+Weibo::Config.proxy = 'http://yangxd:my003131302@nproxy.slof.com:80'
+app = DoubanApp.new
+temp_data = app.access_token.get("/v2/music/search?tag=%E7%A7%91%E5%B9%BB&start=1&count=2&alt=json").body
+puts temp_data
+data = app.parse(temp_data)
+puts data
+data['musics'].each do |item|
+  puts item
+  id_url = app.moveid(item)
+  puts id_url
+  temp_body = app.access_token.get("/v2/music/#{id_url}").body
+  puts temp_body
+  move_data = app.parse(temp_body)
+  puts move_data
+  puts "导演：#{app.authorname_m(move_data)}"
+  puts "名称：#{app.titlename(move_data)}"
+  puts "简介：#{app.summary(move_data)}"
+  puts "图片：#{app.img_m(move_data)}"
+end
+=end
