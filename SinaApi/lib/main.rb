@@ -12,18 +12,18 @@ class CreateInfoTool
   @@time = 60
 
   def initialize
-    Weibo::Config.img_dir = '/home/yangxd/Ruby/douban_image/'
+    Weibo::Config.img_dir = '/home/my03131302/Ruby/douban_image/'
     Weibo::Config.is_proxy_use = false
     Weibo::Config.is_to_gbk = false
     Weibo::Config.proxy = 'http://yangxd:my003131302@nproxy.slof.com:80'
 #=begin
     @app = DoubanApp.new
 #电影
-    #@data = @app.parse(@app.access_token.get("/v2/movie/search?tag=%E7%A7%91%E5%B9%BB&start=34&count=10&alt=json").body)
+    @data = @app.parse(@app.access_token.get("/v2/movie/search?tag=%E7%BA%AA%E5%BD%95%E7%89%87&start=1&count=10&alt=json").body)
 #书
-    #@data_books = @app.parse(@app.access_token.get("/v2/book/search?tag=%E5%B0%8F%E8%AF%B4&start=380&count=10&alt=json").body)
+    @data_books = @app.parse(@app.access_token.get("/v2/book/search?tag=%E6%BC%AB%E7%94%BBstart=1&count=10&alt=json").body)
 #歌
-    @data_musices = @app.parse(@app.access_token.get("/v2/music/search?tag=%E6%B0%91%E8%B0%A3&start=380&count=10&alt=json").body)
+    @data_musices = @app.parse(@app.access_token.get("/v2/music/search?tag=%E7%94%B5%E5%BD%B1%E5%8E%9F%E5%A3%B0&start=1&count=10&alt=json").body)
 #=end
     @sina_app = SinaApp.new
   end
@@ -32,8 +32,8 @@ class CreateInfoTool
     #    threads = [Thread.new{create_bookes},Thread.new {create_weibo},Thread.new {create_musices}];
     #    threads.each { |t|  t.run;puts "线程启动:#{t.to_s}" }
     #    threads.each { |item| item.join  }
-    #create_bookes
-    #create_weibo
+    create_bookes
+    create_weibo
     create_musices
   end
 
@@ -47,7 +47,7 @@ class CreateInfoTool
       rescue => err
         puts err
       end
-      content = "[给力]电影：名称：#{@app.titlename(move_data)},导演：#{@app.authorname(move_data)},演员表："
+      content = "[给力]纪录片：名称：#{@app.titlename(move_data)},导演：#{@app.authorname(move_data)},演员表："
       #{@app.cast(move_data)}"#标签：#{app.tag(move_data)}"#简介：#{app.summary(move_data)}\n"
       subcontent = @app.cast(move_data)
       sub_length = 140 - content.length
@@ -77,7 +77,7 @@ class CreateInfoTool
       rescue => err
         puts err
       end
-      content = "[威武]小说：书名：《#{@app.titlename(move_data)}》,作者：#{@app.authorname_book(move_data)},简介："
+      content = "[威武]漫画：书名：《#{@app.titlename(move_data)}》,作者：#{@app.authorname_book(move_data)},简介："
       subcontent = @app.summary(move_data)
       sub_length = 140 - content.length
       sub_length = 0 if sub_length < 0
