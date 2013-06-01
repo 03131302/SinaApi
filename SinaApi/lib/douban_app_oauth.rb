@@ -76,8 +76,6 @@ class DoubanApp
       browser.link(:text, "登录").click
       browser.text_field(:id, "email").set("03131302@163.com")
       browser.text_field(:id, "password").set("the003131302")
-      puts "请输入验证码:"
-      code_a = gets
       browser.button(:name, "user_login").click
       browser.button(:name, "confirm").click
       browser.url
