@@ -12,18 +12,18 @@ class CreateInfoTool
   @@time = 60
 
   def initialize
-    Weibo::Config.img_dir = '/home/my03131302/Ruby/douban_image/'
+    Weibo::Config.img_dir = 'D:/douban_image/'
     Weibo::Config.is_proxy_use = false
     Weibo::Config.is_to_gbk = false
     Weibo::Config.proxy = 'http://yangxd:my003131302@nproxy.slof.com:80'
 #=begin
     @app = DoubanApp.new
 #电影
-    @data = @app.parse(@app.access_token.get("/v2/movie/search?tag=%E7%BA%AA%E5%BD%95%E7%89%87&start=20&count=10&alt=json").body)
+    @data = @app.parse(@app.access_token.get("/v2/movie/search?tag=%E7%BA%AA%E5%BD%95%E7%89%87&start=40&count=10&alt=json").body)
 #书
-    @data_books = @app.parse(@app.access_token.get("/v2/book/search?tag=%E6%BC%AB%E7%94%BB&start=10&count=20&alt=json").body)
+    @data_books = @app.parse(@app.access_token.get("/v2/book/search?tag=%E6%BC%AB%E7%94%BB&start=10&count=40&alt=json").body)
 #歌
-    @data_musices = @app.parse(@app.access_token.get("/v2/music/search?tag=%E7%94%B5%E5%BD%B1%E5%8E%9F%E5%A3%B0&start=20&count=10&alt=json").body)
+    @data_musices = @app.parse(@app.access_token.get("/v2/music/search?tag=%E7%94%B5%E5%BD%B1%E5%8E%9F%E5%A3%B0&start=40&count=10&alt=json").body)
 #=end
     @sina_app = SinaApp.new
   end

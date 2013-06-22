@@ -2,7 +2,9 @@ require 'oauth2'
 
 module WeiboOAuth2
   class Client < OAuth2::Client
- 
+
+    attr_accessor :access_token
+    
     def initialize(client_id='', client_secret='', opts={}, &block)
       client_id = WeiboOAuth2::Config.api_key if client_id.empty?
       client_secret = WeiboOAuth2::Config.api_secret if client_secret.empty?
@@ -11,7 +13,21 @@ module WeiboOAuth2
       @options[:authorize_url] = '/oauth2/authorize'
       @options[:token_url] = '/oauth2/access_token'
     end
-    
+
+    def self.from_code(code, opts={}, &block)
+      client = self.new(opts, &block)
+      client.auth_code.get_token(code)
+
+      client
+    end
+
+    def self.from_hash(hash, opts={}, &block)
+      client = self.new(opts, &block)
+      client.get_token_from_hash(hash)
+
+      client
+    end    
+
     def authorize_url(params={})
       params[:client_id] = @id unless params[:client_id]
       params[:response_type] = 'code' unless params[:response_type]
@@ -31,15 +47,11 @@ module WeiboOAuth2
     
     def get_token_from_hash(hash)
       access_token = hash.delete(:access_token) || hash.delete('access_token')
-      opts = {:expires_at => (hash.delete(:expires_at) || hash.delete('expires_at')),
-              :header_format => "OAuth2 %s",
-              :param_name => "access_token"}
-
-      @access_token = WeiboOAuth2::AccessToken.new(self, access_token, opts)
+      @access_token = WeiboOAuth2::AccessToken.new( self, access_token, hash.merge(:header_format => 'OAuth2 %s', :param_name => 'access_token') )
     end
     
     def authorized?
-      !!@access_token
+      @access_token && @access_token.validated?
     end
     
     def users
@@ -96,6 +108,14 @@ module WeiboOAuth2
     
     def auth_code
       @auth_code ||= WeiboOAuth2::Strategy::AuthCode.new(self)
+    end
+
+    def place
+      @place ||= WeiboOAuth2::Api::V2::Place.new(@access_token) if @access_token
+    end
+
+    def location
+      @location ||= WeiboOAuth2::Api::V2::Location.new(@access_token) if @access_token
     end
     
   end 

@@ -71,6 +71,7 @@ class DoubanApp
 
   def init_douban_login(url)
     begin
+      Selenium::WebDriver::Firefox::Binary.path="D:/Program Files/Mozilla Firefox/firefox.exe"
       browser = Watir::Browser.new :firefox
       browser.goto url
       browser.link(:text, "登录").click
@@ -198,7 +199,7 @@ class DoubanApp
 end
 #API测试，检索电影
 =begin
-Weibo::Config.img_dir = '/home/yangxd/Ruby/douban_image/'
+Weibo::Config.img_dir = 'D:/douban_image/'
 Weibo::Config.is_proxy_use = false
 Weibo::Config.is_to_gbk = false
 Weibo::Config.proxy = 'http://yangxd:my003131302@nproxy.slof.com:80'
