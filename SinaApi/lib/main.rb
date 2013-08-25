@@ -5,6 +5,7 @@ require 'httparty'
 require File.expand_path('../douban_app_oauth', __FILE__)
 require File.expand_path('../sina_app_aouth', __FILE__)
 require File.expand_path('../weibo/config', __FILE__)
+require File.expand_path('../services/my_server', __FILE__)
 
 
 class CreateInfoTool
@@ -16,14 +17,15 @@ class CreateInfoTool
     Weibo::Config.is_proxy_use = false
     Weibo::Config.is_to_gbk = false
     Weibo::Config.proxy = 'http://yangxd:my003131302@nproxy.slof.com:80'
+    MyServer::run
 #=begin
     @app = DoubanApp.new
 #电影
-    @data = @app.parse(@app.access_token.get("/v2/movie/search?tag=%E7%BA%AA%E5%BD%95%E7%89%87&start=90&count=10&alt=json").body)
+    @data = @app.parse(@app.access_token.get("/v2/movie/search?tag=%E7%BA%AA%E5%BD%95%E7%89%87&start=110&count=10&alt=json").body)
 #书
-    @data_books = @app.parse(@app.access_token.get("/v2/book/search?tag=%E6%BC%AB%E7%94%BB&start=90&count=10&alt=json").body)
+    @data_books = @app.parse(@app.access_token.get("/v2/book/search?tag=%E6%BC%AB%E7%94%BB&start=110&count=10&alt=json").body)
 #歌
-    @data_musices = @app.parse(@app.access_token.get("/v2/music/search?tag=%E7%94%B5%E5%BD%B1%E5%8E%9F%E5%A3%B0&start=90&count=10&alt=json").body)
+    @data_musices = @app.parse(@app.access_token.get("/v2/music/search?tag=%E7%94%B5%E5%BD%B1%E5%8E%9F%E5%A3%B0&start=110&count=10&alt=json").body)
 #=end
     @sina_app = SinaApp.new
   end
@@ -32,9 +34,9 @@ class CreateInfoTool
     #    threads = [Thread.new{create_bookes},Thread.new {create_weibo},Thread.new {create_musices}];
     #    threads.each { |t|  t.run;puts "线程启动:#{t.to_s}" }
     #    threads.each { |item| item.join  }
-    create_bookes
-    create_weibo
     create_musices
+    create_weibo
+    create_bookes
   end
 
   def create_weibo
