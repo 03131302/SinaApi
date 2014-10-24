@@ -6,7 +6,6 @@ GEM
     crack (0.3.1)
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
-    ffi (1.9.0)
     ffi (1.9.0-x86-mingw32)
     hashie (2.0.5)
     httparty (0.11.0)
@@ -49,6 +48,7 @@ PLATFORMS
 
 DEPENDENCIES
   crack (= 0.3.1)
+  ffi
   hashie
   httparty
   oauth
